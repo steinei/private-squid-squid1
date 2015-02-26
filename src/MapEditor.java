@@ -4,6 +4,8 @@ import java.awt.geom.*;
 
 import javax.swing.*;
 
+import sun.java2d.loops.FillRect;
+
 /**
  * @author Ian Steiner and Thomas Rosebrough
  * Map Editor for final project game
@@ -12,6 +14,7 @@ public class MapEditor extends JFrame {
 
 	static Level currentLevel;
 	static Point lastPoint;
+	static MapEditor GameFrame;
 	
 	public static void main(String[] args) {
 		
@@ -19,7 +22,7 @@ public class MapEditor extends JFrame {
 		 * Initializes the JFrame Frame with size 800 x 600
 		 * Creates Menu Bar with one menu and two items
 		 */
-		MapEditor Frame = new MapEditor();
+		GameFrame = new MapEditor();
 		
 		currentLevel = new Level();
 		
@@ -30,45 +33,16 @@ public class MapEditor extends JFrame {
 		JMenuItem loadItem = new JMenuItem("Load");
 		fileMenu.add(saveItem);
 		fileMenu.add(loadItem);
-		Frame.setJMenuBar(menuBar);
+		GameFrame.setJMenuBar(menuBar);
 		
-		Frame.setSize(800,600);
-		Frame.setLocationRelativeTo(null);
-		Frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		Frame.setVisible(true);
-		Frame.setResizable(false);
+		GameFrame.setSize(800,600);
+		GameFrame.setLocationRelativeTo(null);
+		GameFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		GameFrame.setVisible(true);
+		GameFrame.setResizable(false);
 		
-		/**
-		 * ActionListener's for menuBar to save and load .lvl files.
-		 * Opens a dialog box to recieve file name s
-		 * If s == null or s has a length of zero then the saving and loading is bypassed
-		 */
-		saveItem.addActionListener(new ActionListener() {
-					public void actionPerformed(ActionEvent arg0) {
-						
-						String s =
-								(String)JOptionPane.showInputDialog( null, "File name?", "Save",
-										JOptionPane.PLAIN_MESSAGE, null, null, "Untitled");
-						
-						if ((s != null) && (s.length() > 0))
-							Utils.saveLevel(currentLevel, s);
-						
-					}
-		});
-		
-		loadItem.addActionListener(new ActionListener() {
-					public void actionPerformed(ActionEvent arg0) {
-						
-						String s =
-								(String)JOptionPane.showInputDialog( null, "File name?", "Load",
-										JOptionPane.PLAIN_MESSAGE, null, null, "Untitled");
-						
-						if ((s != null) && (s.length() > 0))
-							currentLevel = Utils.loadLevel(s);
-						
-					}
-		});
-		
+		saveItem.addActionListener(new SaveClass());
+		loadItem.addActionListener(new LoadClass());
 
 	}
 	/**
@@ -99,10 +73,10 @@ public class MapEditor extends JFrame {
 		
 		Graphics2D page = (Graphics2D) g;
 		
-		for (int i = 0; i <= 10; i++){
-			for (int j = 0; j <= 10; j ++){
+		for (int y = 0; y < 10; y++){
+			for (int x = 0; x < 10; x++){
 				
-				switch (currentLevel.map[i][j]){
+				switch (currentLevel.map[y][x]){
 				case 0:
 					page.setColor(Color.GREEN);
 					break;
@@ -117,7 +91,7 @@ public class MapEditor extends JFrame {
 					break;
 				}
 				
-				page.draw(new Rectangle2D.Double((50 * i), (50 * j), 50, 50));
+				page.fillRect((50 * x) + 50, (50 * y) + 50, 50, 50);
 				
 			}
 		}
@@ -131,14 +105,45 @@ public class MapEditor extends JFrame {
 	 * @param y - the y index
 	 */
 	public static void changeBlock(int x, int y) {
+		x = (x - 50) / 50;
+		y = (y - 50) / 50;
 		
-		x /= 50;
-		y /= 50;
+		currentLevel.map[y][x] ++;
+		if (currentLevel.map[y][x] >= 5)
+			currentLevel.map[y][x] = 0;
 		
-		currentLevel.map[x][y] ++;
-		if (currentLevel.map[x][y] >= 5)
-			currentLevel.map[x][y] = 0;
-		
+	}
+	
+	/**
+	 * ActionListener's for menuBar to save and load .lvl files.
+	 * Opens a dialog box to recieve file name s
+	 * If s == null or s has a length of zero then the saving and loading is bypassed
+	 */
+	private static class SaveClass implements ActionListener {
+		public void actionPerformed(ActionEvent e) {
+			
+			String s =
+					(String)JOptionPane.showInputDialog( GameFrame, "File name?", "Save",
+							JOptionPane.PLAIN_MESSAGE, null, null, "Untitled");
+			
+			if ((s != null) && (s.length() > 0))
+				Utils.saveLevel(currentLevel, s);
+			
+		}
+	}
+	
+	private static class LoadClass implements ActionListener {
+		public void actionPerformed(ActionEvent e) {
+			
+			String s =
+					(String)JOptionPane.showInputDialog( GameFrame, "File name?", "Load",
+							JOptionPane.PLAIN_MESSAGE, null, null, "Untitled");
+			
+			if ((s != null) && (s.length() > 0))
+				currentLevel = Utils.loadLevel(s);
+			GameFrame.repaint();
+			
+		}
 	}
 	
 	
