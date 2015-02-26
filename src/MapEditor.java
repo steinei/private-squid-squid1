@@ -1,10 +1,6 @@
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.geom.*;
-
 import javax.swing.*;
-
-import sun.java2d.loops.FillRect;
 
 /**
  * @author Ian Steiner and Thomas Rosebrough
@@ -16,6 +12,9 @@ public class MapEditor extends JFrame {
 	static Point lastPoint;
 	static MapEditor GameFrame;
 	
+	static JMenuBar menuBar;
+	static JMenu fileMenu;
+	
 	public static void main(String[] args) {
 		
 		/**
@@ -26,11 +25,21 @@ public class MapEditor extends JFrame {
 		
 		currentLevel = new Level();
 		
-		JMenuBar menuBar = new JMenuBar();
-		JMenu fileMenu = new JMenu("File");
+		menuBar = new JMenuBar();
+		fileMenu = new JMenu("File");
 		menuBar.add(fileMenu);
+		
+		/**
+		 * Creates intances of nested action listener classes for
+		 * saving and loading files
+		 */
+		
 		JMenuItem saveItem = new JMenuItem("Save");
 		JMenuItem loadItem = new JMenuItem("Load");
+		saveItem.addActionListener(new SaveClass());
+		loadItem.addActionListener(new LoadClass());
+		GameFrame.addMouseListener(new mouseClass());
+		
 		fileMenu.add(saveItem);
 		fileMenu.add(loadItem);
 		GameFrame.setJMenuBar(menuBar);
@@ -41,8 +50,7 @@ public class MapEditor extends JFrame {
 		GameFrame.setVisible(true);
 		GameFrame.setResizable(false);
 		
-		saveItem.addActionListener(new SaveClass());
-		loadItem.addActionListener(new LoadClass());
+		GameFrame.repaint();
 
 	}
 	/**
@@ -53,17 +61,6 @@ public class MapEditor extends JFrame {
 		
 		super("Game Frame No Name Take Blame No Shame");
 		
-		addMouseListener(new MouseAdapter() {
-            public void mousePressed(MouseEvent e) {
-            	
-            	Graphics g = getGraphics();
-                lastPoint = new Point(e.getX(), e.getY());
-                changeBlock( lastPoint.x, lastPoint.y );
-                repaint();
-                
-            }
-        });
-		
 	}
 	
 	/**
@@ -73,6 +70,10 @@ public class MapEditor extends JFrame {
 		
 		Graphics2D page = (Graphics2D) g;
 		
+		/**
+		 * Draws map array from current level object
+		 * Steiner fixed the 2D array switch
+		 */
 		for (int y = 0; y < 10; y++){
 			for (int x = 0; x < 10; x++){
 				
@@ -83,10 +84,10 @@ public class MapEditor extends JFrame {
 				case 1:
 					page.setColor(Color.RED);
 					break;
-				case 3:
+				case 2:
 					page.setColor(Color.BLUE);
 					break;
-				case 4:
+				case 3:
 					page.setColor(Color.WHITE);
 					break;
 				}
@@ -109,7 +110,7 @@ public class MapEditor extends JFrame {
 		y = (y - 50) / 50;
 		
 		currentLevel.map[y][x] ++;
-		if (currentLevel.map[y][x] >= 5)
+		if (currentLevel.map[y][x] >= 4)
 			currentLevel.map[y][x] = 0;
 		
 	}
@@ -142,6 +143,41 @@ public class MapEditor extends JFrame {
 			if ((s != null) && (s.length() > 0))
 				currentLevel = Utils.loadLevel(s);
 			GameFrame.repaint();
+			
+		}
+	}
+	
+	/**
+	 * MouseListener for clicking on squares
+	 * calls changeBlock with current x and y
+	 */
+	private static class mouseClass implements MouseListener {
+		public void mousePressed(MouseEvent e) {
+			
+			Graphics g = GameFrame.getGraphics();
+            lastPoint = new Point(e.getX(), e.getY());
+            changeBlock( lastPoint.x, lastPoint.y );
+            GameFrame.repaint();
+			
+		}
+
+		@Override
+		public void mouseClicked(MouseEvent arg0) {
+			
+		}
+
+		@Override
+		public void mouseEntered(MouseEvent arg0) {
+			
+		}
+
+		@Override
+		public void mouseExited(MouseEvent arg0) {
+			
+		}
+
+		@Override
+		public void mouseReleased(MouseEvent arg0) {
 			
 		}
 	}
