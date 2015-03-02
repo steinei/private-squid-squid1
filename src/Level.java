@@ -5,16 +5,10 @@
  */	
 public class Level implements java.io.Serializable {
 	
-	/**
-	 * 
-	 */
 	public String name = "";
 	
 	int[][] map = new int[10][10];
 	
-	/**
-	 * 
-	 */
 	public Level() {
 		
 		for(int i = 0; i < 10; i++){

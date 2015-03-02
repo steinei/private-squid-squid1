@@ -1,11 +1,18 @@
+
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.image.*;
+import java.io.File;
+import java.io.IOException;
+
+import javax.imageio.*;
 import javax.swing.*;
 
 /**
  * @author Ian Steiner and Thomas Rosebrough
  * Map Editor for final project game
  */
+@SuppressWarnings("serial")
 public class MapEditor extends JFrame {
 
 	static Level currentLevel;
@@ -14,6 +21,7 @@ public class MapEditor extends JFrame {
 	
 	static JMenuBar menuBar;
 	static JMenu fileMenu;
+	static BufferedImage tileSheet = null;
 	
 	public static void main(String[] args) {
 		
@@ -29,22 +37,30 @@ public class MapEditor extends JFrame {
 		fileMenu = new JMenu("File");
 		menuBar.add(fileMenu);
 		
+		try {
+			tileSheet = ImageIO.read(new File("walls_sprite_map.png"));
+		} catch (IOException i) {
+			i.printStackTrace();
+		}
+		
 		/**
-		 * Creates intances of nested action listener classes for
+		 * Creates instances of nested action listener classes for
 		 * saving and loading files
 		 */
-		
+		JMenuItem newItem = new JMenuItem("New");
 		JMenuItem saveItem = new JMenuItem("Save");
-		JMenuItem loadItem = new JMenuItem("Load");
+		JMenuItem loadItem = new JMenuItem("Open");
+		newItem.addActionListener(new NewClass());
 		saveItem.addActionListener(new SaveClass());
 		loadItem.addActionListener(new LoadClass());
 		GameFrame.addMouseListener(new mouseClass());
 		
+		fileMenu.add(newItem);
 		fileMenu.add(saveItem);
 		fileMenu.add(loadItem);
 		GameFrame.setJMenuBar(menuBar);
 		
-		GameFrame.setSize(800,600);
+		GameFrame.setSize(600,580);
 		GameFrame.setLocationRelativeTo(null);
 		GameFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		GameFrame.setVisible(true);
@@ -59,7 +75,7 @@ public class MapEditor extends JFrame {
 	 */
 	public MapEditor(){
 		
-		super("Game Frame No Name Take Blame No Shame");
+		super("Gravity Prison Map Maker");
 		
 	}
 	
@@ -70,6 +86,10 @@ public class MapEditor extends JFrame {
 		
 		Graphics2D page = (Graphics2D) g;
 		
+		BufferedImage tile = null;
+		Image offscreen = createImage(getWidth(), getHeight());
+		Graphics offPage = offscreen.getGraphics();
+		
 		/**
 		 * Draws map array from current level object
 		 * Steiner fixed the 2D array switch
@@ -77,49 +97,59 @@ public class MapEditor extends JFrame {
 		for (int y = 0; y < 10; y++){
 			for (int x = 0; x < 10; x++){
 				
-				switch (currentLevel.map[y][x]){
-				case 0:
-					page.setColor(Color.GREEN);
-					break;
-				case 1:
-					page.setColor(Color.RED);
-					break;
-				case 2:
-					page.setColor(Color.BLUE);
-					break;
-				case 3:
-					page.setColor(Color.WHITE);
-					break;
-				}
-				
-				page.fillRect((50 * x) + 50, (50 * y) + 50, 50, 50);
+				int tileValue = currentLevel.map[y][x];
+				tile = tileSheet.getSubimage((tileValue % 3) * 25, (tileValue / 3) * 25, 25, 25);
+
+				offPage.drawImage(tile, (50 * x) + 50, (50 * y) + 50, 50, 50, null);
 				
 			}
 		}
+		
+		page.drawImage(offscreen, 0, 0, null);
 	
 	}
 	
 	/**
 	 * Increments the value at an x and y index by one,
-	 * limiting the value at 4 and wraping to zero if neccessary
-	 * @param x - the x index of the block to change
-	 * @param y - the y index
+	 * limiting the value at 4 and wrapping to zero if necessary
+	 * 
+	 * precon - x and y are within the frame
+	 * 
+	 * @param x - the x location within JFrame of the block to change
+	 * @param y - the y location
 	 */
-	public static void changeBlock(int x, int y) {
+	public static void changeBlock(int x, int y, Boolean leftClick) {
+		int i = tileSheet.getHeight() / 25;
+		
 		x = (x - 50) / 50;
 		y = (y - 50) / 50;
+		if( leftClick == true){
+			currentLevel.map[y][x] ++;
 		
-		currentLevel.map[y][x] ++;
-		if (currentLevel.map[y][x] >= 4)
-			currentLevel.map[y][x] = 0;
+			if (currentLevel.map[y][x] > (3 * i) - 1)
+				currentLevel.map[y][x] = 0;
+		} else {
+			currentLevel.map[y][x] --;
+			
+			if (currentLevel.map[y][x] < 0)
+				currentLevel.map[y][x] = (3 * i) - 1;
+		}
 		
 	}
 	
 	/**
-	 * ActionListener's for menuBar to save and load .lvl files.
-	 * Opens a dialog box to recieve file name s
+	 * ActionListener's for menuBar to save, open, and create new .lvl files.
+	 * Opens a dialog box to receive file name s
 	 * If s == null or s has a length of zero then the saving and loading is bypassed
 	 */
+	private static class NewClass implements ActionListener {
+		public void actionPerformed(ActionEvent e) {
+			
+			currentLevel = new Level();
+			GameFrame.repaint();
+			
+		}
+	}
 	private static class SaveClass implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
 			
@@ -153,10 +183,12 @@ public class MapEditor extends JFrame {
 	 */
 	private static class mouseClass implements MouseListener {
 		public void mousePressed(MouseEvent e) {
+			int mouseButton = e.getButton();
 			
 			Graphics g = GameFrame.getGraphics();
+			
             lastPoint = new Point(e.getX(), e.getY());
-            changeBlock( lastPoint.x, lastPoint.y );
+            changeBlock( lastPoint.x, lastPoint.y, ( mouseButton == 1 ) );
             GameFrame.repaint();
 			
 		}
