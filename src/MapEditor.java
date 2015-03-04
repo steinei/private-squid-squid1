@@ -1,8 +1,7 @@
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.*;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 
 import javax.imageio.*;
 import javax.swing.*;
@@ -20,7 +19,7 @@ public class MapEditor extends JFrame {
 	
 	static JMenuBar menuBar;
 	static JMenu fileMenu, specialMenu;
-	static public enum lissnerType {
+	static public enum ListenerType {
 	    NEW, SAVE, LOAD, TILE, SHUF
 	}
 	
@@ -59,24 +58,19 @@ public class MapEditor extends JFrame {
 		EditorFrame.setJMenuBar(menuBar);
 		fileMenu = new JMenu("File");
 		specialMenu = new JMenu("Specials");
-		menuBar.add(fileMenu);
-		menuBar.add(specialMenu);
 		
-
-		/**
-		 * Creates instances of nested action listener classes for
-		 * saving and loading files
-		 */
+		EditorFrame.repaint();
+		
 		JMenuItem newItem = new JMenuItem("New");
 		JMenuItem saveItem = new JMenuItem("Save");
 		JMenuItem loadItem = new JMenuItem("Open");
 		JMenuItem tileItem = new JMenuItem("Graphics");
 		JMenuItem shuffleItem = new JMenuItem("Random Map");
-		newItem.addActionListener(new ListenerClass(lissnerType.NEW));
-		saveItem.addActionListener(new ListenerClass(lissnerType.SAVE));
-		loadItem.addActionListener(new ListenerClass(lissnerType.LOAD));
-		tileItem.addActionListener(new ListenerClass(lissnerType.TILE));
-		shuffleItem.addActionListener(new ListenerClass(lissnerType.SHUF));
+		newItem.addActionListener(new ListenerClass(ListenerType.NEW));
+		saveItem.addActionListener(new ListenerClass(ListenerType.SAVE));
+		loadItem.addActionListener(new ListenerClass(ListenerType.LOAD));
+		tileItem.addActionListener(new ListenerClass(ListenerType.TILE));
+		shuffleItem.addActionListener(new ListenerClass(ListenerType.SHUF));
 		EditorFrame.addMouseListener(new MouseClass());
 		
 		fileMenu.add(newItem);
@@ -84,8 +78,9 @@ public class MapEditor extends JFrame {
 		fileMenu.add(loadItem);
 		specialMenu.add(tileItem);
 		specialMenu.add(shuffleItem);
-		
-		EditorFrame.repaint();
+		menuBar.add(fileMenu);
+		menuBar.add(specialMenu);
+		menuBar.setVisible(true);
 
 	}
 	/**
@@ -109,7 +104,7 @@ public class MapEditor extends JFrame {
 		
 		/**
 		 * Draws map array from current level object
-		 * Steiner fixed the 2D array switch
+		 * Steiner fixed the 2D array search
 		 */
 		for (int y = 0; y < 10; y++){
 			for (int x = 0; x < 10; x++){
@@ -161,9 +156,9 @@ public class MapEditor extends JFrame {
 	 */
 	private static class ListenerClass implements ActionListener {
 		
-		lissnerType type;
+		ListenerType type;
 		
-		public ListenerClass( lissnerType t ){
+		public ListenerClass( ListenerType t ) {
 			
 			type = t;
 			
@@ -171,12 +166,12 @@ public class MapEditor extends JFrame {
 		
 		public void actionPerformed(ActionEvent e) {
 			
-			if( type == lissnerType.NEW ) {
+			if( type == ListenerType.NEW ) {
 				
 				currentLevel = new Level();
 				EditorFrame.repaint();
 				
-			} else if( type == lissnerType.SAVE ) {
+			} else if( type == ListenerType.SAVE ) {
 				
 				String s = (String) JOptionPane.showInputDialog( EditorFrame, "File name?", "Save",
 						JOptionPane.PLAIN_MESSAGE, null, null, currentLevel);
@@ -186,7 +181,7 @@ public class MapEditor extends JFrame {
 					Utils.saveLevel(currentLevel, s);
 				}
 				
-			} else if( type == lissnerType.LOAD ) {
+			} else if( type == ListenerType.LOAD ) {
 				
 				String s = (String) JOptionPane.showInputDialog( EditorFrame, "File name?", "Load",
 						JOptionPane.PLAIN_MESSAGE, null, null, "Untitled");
@@ -195,7 +190,7 @@ public class MapEditor extends JFrame {
 					currentLevel = Utils.loadLevel(s);
 				EditorFrame.repaint();
 				
-			} else if( type == lissnerType.TILE ) {
+			} else if( type == ListenerType.TILE ) {
 				
 				Object[] possibilities = {"Prison", "Circuit"};
 				
@@ -210,9 +205,9 @@ public class MapEditor extends JFrame {
 				
 				EditorFrame.repaint();
 				
-			} else if( type == lissnerType.SHUF ) {
+			} else if( type == ListenerType.SHUF ) {
 				
-				currentLevel.shuffle();
+				 currentLevel.shuffle();
 				
 				EditorFrame.repaint();
 				
