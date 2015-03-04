@@ -25,8 +25,8 @@ public class MapEditor extends JFrame {
 	
 	static BufferedImage tileSheet = null;
 	
-	static final int TILEWIDTH = 25;
-	static final int TILEHEIGHT = 25;
+	static final int TILE_WIDTH = 25;
+	static final int TILE_HEIGHT = 25;
 	static int tileUnitWidth;
 	
 	public static void main(String[] args) {
@@ -45,7 +45,7 @@ public class MapEditor extends JFrame {
 			i.printStackTrace();
 		}
 		
-		tileUnitWidth = tileSheet.getWidth() / TILEWIDTH;
+		tileUnitWidth = tileSheet.getWidth() / TILE_WIDTH;
 				
 		EditorFrame.setSize(600,580);
 		EditorFrame.setLocationRelativeTo(null);
@@ -110,7 +110,7 @@ public class MapEditor extends JFrame {
 			for (int x = 0; x < 10; x++){
 				
 				int tileValue = currentLevel.map[y][x];
-				tile = tileSheet.getSubimage((tileValue % tileUnitWidth) * TILEWIDTH, (tileValue / tileUnitWidth) * TILEWIDTH, TILEWIDTH, TILEHEIGHT);
+				tile = tileSheet.getSubimage((tileValue % tileUnitWidth) * TILE_WIDTH, (tileValue / tileUnitWidth) * TILE_WIDTH, TILE_WIDTH, TILE_HEIGHT);
 
 				offPage.drawImage(tile, (50 * x) + 50, (50 * y) + 50, 50, 50, this);
 				
