@@ -1,9 +1,7 @@
-
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.*;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 
 import javax.imageio.*;
 import javax.swing.*;
@@ -17,11 +15,19 @@ public class MapEditor extends JFrame {
 
 	static Level currentLevel;
 	static Point lastPoint;
-	static MapEditor GameFrame;
+	static MapEditor EditorFrame;
 	
 	static JMenuBar menuBar;
-	static JMenu fileMenu;
+	static JMenu fileMenu, specialMenu;
+	static public enum ListenerType {
+	    NEW, SAVE, LOAD, TILE, SHUF
+	}
+	
 	static BufferedImage tileSheet = null;
+	
+	static final int TILE_WIDTH = 25;
+	static final int TILE_HEIGHT = 25;
+	static int tileUnitWidth;
 	
 	public static void main(String[] args) {
 		
@@ -29,44 +35,52 @@ public class MapEditor extends JFrame {
 		 * Initializes the JFrame Frame with size 800 x 600
 		 * Creates Menu Bar with one menu and two items
 		 */
-		GameFrame = new MapEditor();
+		EditorFrame = new MapEditor();
 		
 		currentLevel = new Level();
-		
-		menuBar = new JMenuBar();
-		fileMenu = new JMenu("File");
-		menuBar.add(fileMenu);
-		
+				
 		try {
-			tileSheet = ImageIO.read(new File("walls_sprite_map.png"));
+			tileSheet = ImageIO.read(new File("assets/PrisonMap.png"));
 		} catch (IOException i) {
 			i.printStackTrace();
 		}
 		
-		/**
-		 * Creates instances of nested action listener classes for
-		 * saving and loading files
-		 */
+		tileUnitWidth = tileSheet.getWidth() / TILE_WIDTH;
+				
+		EditorFrame.setSize(600,580);
+		EditorFrame.setLocationRelativeTo(null);
+		EditorFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		EditorFrame.setVisible(true);
+		EditorFrame.setResizable(false);
+		
+
+		menuBar = new JMenuBar();
+		EditorFrame.setJMenuBar(menuBar);
+		fileMenu = new JMenu("File");
+		specialMenu = new JMenu("Specials");
+		
+		EditorFrame.repaint();
+		
 		JMenuItem newItem = new JMenuItem("New");
 		JMenuItem saveItem = new JMenuItem("Save");
 		JMenuItem loadItem = new JMenuItem("Open");
-		newItem.addActionListener(new NewClass());
-		saveItem.addActionListener(new SaveClass());
-		loadItem.addActionListener(new LoadClass());
-		GameFrame.addMouseListener(new mouseClass());
+		JMenuItem tileItem = new JMenuItem("Graphics");
+		JMenuItem shuffleItem = new JMenuItem("Random Map");
+		newItem.addActionListener(new ListenerClass(ListenerType.NEW));
+		saveItem.addActionListener(new ListenerClass(ListenerType.SAVE));
+		loadItem.addActionListener(new ListenerClass(ListenerType.LOAD));
+		tileItem.addActionListener(new ListenerClass(ListenerType.TILE));
+		shuffleItem.addActionListener(new ListenerClass(ListenerType.SHUF));
+		EditorFrame.addMouseListener(new MouseClass());
 		
 		fileMenu.add(newItem);
 		fileMenu.add(saveItem);
 		fileMenu.add(loadItem);
-		GameFrame.setJMenuBar(menuBar);
-		
-		GameFrame.setSize(600,580);
-		GameFrame.setLocationRelativeTo(null);
-		GameFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		GameFrame.setVisible(true);
-		GameFrame.setResizable(false);
-		
-		GameFrame.repaint();
+		specialMenu.add(tileItem);
+		specialMenu.add(shuffleItem);
+		menuBar.add(fileMenu);
+		menuBar.add(specialMenu);
+		menuBar.setVisible(true);
 
 	}
 	/**
@@ -82,9 +96,7 @@ public class MapEditor extends JFrame {
 	/**
 	 * @param g - Graphics passed by a call in the superclass 
 	 */
-	public void paint(Graphics g) {
-		
-		Graphics2D page = (Graphics2D) g;
+	public void paint(Graphics page) {
 		
 		BufferedImage tile = null;
 		Image offscreen = createImage(getWidth(), getHeight());
@@ -92,20 +104,20 @@ public class MapEditor extends JFrame {
 		
 		/**
 		 * Draws map array from current level object
-		 * Steiner fixed the 2D array switch
+		 * Steiner fixed the 2D array search
 		 */
 		for (int y = 0; y < 10; y++){
 			for (int x = 0; x < 10; x++){
 				
 				int tileValue = currentLevel.map[y][x];
-				tile = tileSheet.getSubimage((tileValue % 3) * 25, (tileValue / 3) * 25, 25, 25);
+				tile = tileSheet.getSubimage((tileValue % tileUnitWidth) * TILE_WIDTH, (tileValue / tileUnitWidth) * TILE_WIDTH, TILE_WIDTH, TILE_HEIGHT);
 
-				offPage.drawImage(tile, (50 * x) + 50, (50 * y) + 50, 50, 50, null);
+				offPage.drawImage(tile, (50 * x) + 50, (50 * y) + 50, 50, 50, this);
 				
 			}
 		}
 		
-		page.drawImage(offscreen, 0, 0, null);
+		page.drawImage(offscreen, 0, 0, this);
 	
 	}
 	
@@ -142,37 +154,65 @@ public class MapEditor extends JFrame {
 	 * Opens a dialog box to receive file name s
 	 * If s == null or s has a length of zero then the saving and loading is bypassed
 	 */
-	private static class NewClass implements ActionListener {
-		public void actionPerformed(ActionEvent e) {
+	private static class ListenerClass implements ActionListener {
+		
+		ListenerType type;
+		
+		public ListenerClass( ListenerType t ) {
 			
-			currentLevel = new Level();
-			GameFrame.repaint();
-			
-		}
-	}
-	private static class SaveClass implements ActionListener {
-		public void actionPerformed(ActionEvent e) {
-			
-			String s =
-					(String)JOptionPane.showInputDialog( GameFrame, "File name?", "Save",
-							JOptionPane.PLAIN_MESSAGE, null, null, "Untitled");
-			
-			if ((s != null) && (s.length() > 0))
-				Utils.saveLevel(currentLevel, s);
+			type = t;
 			
 		}
-	}
-	
-	private static class LoadClass implements ActionListener {
+		
 		public void actionPerformed(ActionEvent e) {
 			
-			String s =
-					(String)JOptionPane.showInputDialog( GameFrame, "File name?", "Load",
-							JOptionPane.PLAIN_MESSAGE, null, null, "Untitled");
+			if( type == ListenerType.NEW ) {
+				
+				currentLevel = new Level();
+				EditorFrame.repaint();
+				
+			} else if( type == ListenerType.SAVE ) {
+				
+				String s = (String) JOptionPane.showInputDialog( EditorFrame, "File name?", "Save",
+						JOptionPane.PLAIN_MESSAGE, null, null, currentLevel);
+		
+				if ((s != null) && (s.length() > 0)) {
+					currentLevel.setName(s);
+					Utils.saveLevel(currentLevel, s);
+				}
+				
+			} else if( type == ListenerType.LOAD ) {
+				
+				String s = (String) JOptionPane.showInputDialog( EditorFrame, "File name?", "Load",
+						JOptionPane.PLAIN_MESSAGE, null, null, "Untitled");
+		
+				if ((s != null) && (s.length() > 0))
+					currentLevel = Utils.loadLevel(s);
+				EditorFrame.repaint();
+				
+			} else if( type == ListenerType.TILE ) {
+				
+				Object[] possibilities = {"Prison", "Circuit"};
+				
+				String s = (String) JOptionPane.showInputDialog( EditorFrame, "Tile Map?", "Change Graphics",
+						JOptionPane.PLAIN_MESSAGE, null, possibilities, "Prison");
+				
+				try {
+					tileSheet = ImageIO.read(new File("assets/" + s + "Map.png"));
+				} catch (IOException i) {
+					i.printStackTrace();
+				}
+				
+				EditorFrame.repaint();
+				
+			} else if( type == ListenerType.SHUF ) {
+				
+				 currentLevel.shuffle();
+				
+				EditorFrame.repaint();
+				
+			}
 			
-			if ((s != null) && (s.length() > 0))
-				currentLevel = Utils.loadLevel(s);
-			GameFrame.repaint();
 			
 		}
 	}
@@ -181,15 +221,15 @@ public class MapEditor extends JFrame {
 	 * MouseListener for clicking on squares
 	 * calls changeBlock with current x and y
 	 */
-	private static class mouseClass implements MouseListener {
+	private static class MouseClass implements MouseListener {
 		public void mousePressed(MouseEvent e) {
 			int mouseButton = e.getButton();
 			
-			Graphics g = GameFrame.getGraphics();
+			Graphics g = EditorFrame.getGraphics();
 			
             lastPoint = new Point(e.getX(), e.getY());
             changeBlock( lastPoint.x, lastPoint.y, ( mouseButton == 1 ) );
-            GameFrame.repaint();
+            EditorFrame.repaint();
 			
 		}
 
