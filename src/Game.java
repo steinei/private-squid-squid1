@@ -18,6 +18,9 @@ public class Game extends JFrame{
 	static final Point Origin  = new Point(400,300);
 	static double angle = 0;
 	
+	static JMenuBar menuBar;
+	static JMenu fileMenu;
+	
 	static boolean mouseIsPressed = false;
 	static boolean firstTime = true;
 	
@@ -62,8 +65,42 @@ public class Game extends JFrame{
 	  GameFrame.setResizable(false);
 	  GameFrame.addMouseListener(new mouseClass());
 	  
+	  menuBar = new JMenuBar();
+	  fileMenu = new JMenu("File");
+	  
+	  JMenuItem loadItem = new JMenuItem("Open");
+	  loadItem.addActionListener(new GameListenerClass());
+	  
+	  fileMenu.add(loadItem);
+	  menuBar.add(fileMenu);
+	  GameFrame.setJMenuBar(menuBar);
+	  menuBar.setVisible(true);
+	  
 	 }
 	  
+	 /**
+		 * ActionListener for menuBar to open .lvl files.
+		 * Opens a dialog box to receive file name s
+		 * If s == null or s has a length of zero then the saving and loading is bypassed
+		 */
+		private static class GameListenerClass implements ActionListener {
+			
+			public GameListenerClass() {
+				
+			}
+			
+			public void actionPerformed(ActionEvent e) {
+					
+				String s = (String) JOptionPane.showInputDialog( GameFrame, "File name?", "Load",
+							JOptionPane.PLAIN_MESSAGE, null, null, "Untitled");
+			
+				if ((s != null) && (s.length() > 0))
+					currentLevel = Utils.loadLevel(s);
+				GameFrame.repaint();
+				
+			}
+		}
+	 
 	  /** 
 	   * mouseListener for dragging rectangle
 	   * changes whether mousePressed is true or false
@@ -102,6 +139,7 @@ public class Game extends JFrame{
 	  }
 	 /**
 	  * @param Graphics g
+	  * Draws the level currently loaded and allows it to be rotated by clicking the mouse
 	  */
 	 public void paint(Graphics page) {
 		 
@@ -125,7 +163,7 @@ public class Game extends JFrame{
 			 angle = ((nextPoint.x - Origin.x)*2.0/BAR_WIDTH)*2*Math.PI;
 			 //offPage.drawString("" + angle, 50, 560);
 			 //offPage.translate(Origin.x, Origin.y);
-			 offPage.rotate(angle, 300, 300);
+			 offPage.rotate(angle, 400, 300);
 			 
 			 for (int y = 0; y < 10; y++){
 					for (int x = 0; x < 10; x++){
@@ -133,21 +171,21 @@ public class Game extends JFrame{
 						int tileValue = currentLevel.map[y][x];
 						tile = tileSheet.getSubimage((tileValue % tileUnitWidth) * TILE_WIDTH, (tileValue / tileUnitWidth) * TILE_WIDTH, TILE_WIDTH, TILE_HEIGHT);
 
-						offPage.drawImage(tile, (50 * x) + 50, (50 * y) + 50, 50, 50, this);
+						offPage.drawImage(tile, (50 * x) + 150, (50 * y) + 50, 50, 50, this);
 						
 					}
 			 }
 			 GameFrame.repaint();
 		 }
 		 else{
-			 offPage.rotate(angle, 300, 300);
+			 offPage.rotate(angle, 400, 300);
 			 for (int y = 0; y < 10; y++){
 					for (int x = 0; x < 10; x++){
 						
 						int tileValue = currentLevel.map[y][x];
 						tile = tileSheet.getSubimage((tileValue % tileUnitWidth) * TILE_WIDTH, (tileValue / tileUnitWidth) * TILE_WIDTH, TILE_WIDTH, TILE_HEIGHT);
 
-						offPage.drawImage(tile, (50 * x) + 50, (50 * y) + 50, 50, 50, this);
+						offPage.drawImage(tile, (50 * x) + 150, (50 * y) + 50, 50, 50, this);
 						
 					}
 				}
@@ -161,7 +199,7 @@ public class Game extends JFrame{
 						int tileValue = currentLevel.map[y][x];
 						tile = tileSheet.getSubimage((tileValue % tileUnitWidth) * TILE_WIDTH, (tileValue / tileUnitWidth) * TILE_WIDTH, TILE_WIDTH, TILE_HEIGHT);
 
-						offPage.drawImage(tile, (50 * x) + 50, (50 * y) + 50, 50, 50, this);
+						offPage.drawImage(tile, (50 * x) + 150, (50 * y) + 50, 50, 50, this);
 						
 					}
 				}
