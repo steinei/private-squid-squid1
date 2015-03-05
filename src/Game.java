@@ -36,7 +36,7 @@ public class Game extends JFrame{
 	  
 	 /**
 	  * @param args
-	  * Currently, intended to create a BufferedImage on screen that can be rotated by dragging the mouse
+	  * Currently, intended to create a BufferedImage on screen that can be rotated by clicking/dragging the mouse
 	  *  in a JFrame 800 * 600
 	  */
 	 public static void main(String[] args) {
@@ -120,13 +120,12 @@ public class Game extends JFrame{
 				 System.err.println("Mouse out of bounds case caught.");
 			 }
 			 
-			 
 			 //offPage.clearRect(0, 0, 800, 600);
 			 //offPage.drawString("" + nextPoint.x + "    " + nextPoint.y + "    " + angle + "    " + lastPoint.x + "    " + lastPoint.y, 50, 500);
 			 angle = ((nextPoint.x - Origin.x)*2.0/BAR_WIDTH)*2*Math.PI;
 			 //offPage.drawString("" + angle, 50, 560);
 			 //offPage.translate(Origin.x, Origin.y);
-			 offPage.rotate(angle, 250, 250);
+			 offPage.rotate(angle, 300, 300);
 			 
 			 for (int y = 0; y < 10; y++){
 					for (int x = 0; x < 10; x++){
@@ -137,11 +136,23 @@ public class Game extends JFrame{
 						offPage.drawImage(tile, (50 * x) + 50, (50 * y) + 50, 50, 50, this);
 						
 					}
-				}
-			 
-			 lastPoint = new Point(nextPoint);
+			 }
+			 GameFrame.repaint();
+		 }
+		 else{
+			 offPage.rotate(angle, 300, 300);
+			 for (int y = 0; y < 10; y++){
+					for (int x = 0; x < 10; x++){
+						
+						int tileValue = currentLevel.map[y][x];
+						tile = tileSheet.getSubimage((tileValue % tileUnitWidth) * TILE_WIDTH, (tileValue / tileUnitWidth) * TILE_WIDTH, TILE_WIDTH, TILE_HEIGHT);
 
-		}
+						offPage.drawImage(tile, (50 * x) + 50, (50 * y) + 50, 50, 50, this);
+						
+					}
+				}
+			 GameFrame.repaint();
+		 }
 		 if(firstTime){
 			 
 			 for (int y = 0; y < 10; y++){
