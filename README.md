@@ -21,7 +21,7 @@ and gameutil.physics (Vector, PhysicsTester, and an unused interface Gravity).
 
 The assets are all made in Photoshop by Tommy. They are really cool and borderless and stuff. Tommy is very talented. What a
 guy. The stuff he makes is legendary. He really is the coolest guy I know. I think deep down, we all want to be Tommy. Like all
-the time. RIP Tommy. We miss you, and your subtle, potent, but also tastefull humour.
+the time. RIP Tommy. We miss you, and your subtle, potent, but also tasteful humour.
 
 In loving memory of Tommy Squidsbrough,
 2015 - Forever
