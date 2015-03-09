@@ -16,4 +16,12 @@ a final vector for gravity, and it constantly is adding gravity to its velocity 
 case it also adds normal vector, creating an illusion of sliding along a surface. Not all of these have been implemented yet,
 but the structure for it is in place.
 
-Our classes are in four packages: FinalGame (which holds Game
+Our classes are in four packages: finalgame (which holds Game, Level, and Player), gameutil (Util), gameutil.level (MapEditor),
+and gameutil.physics (Vector, PhysicsTester, and an unused interface Gravity).
+
+The assets are all made in Photoshop by Tommy. They are really cool and borderless and stuff. Tommy is very talented. What a
+guy. The stuff he makes is legendary. He really is the coolest guy I know. I think deep down, we all want to be Tommy. Like all
+the time. RIP Tommy. We miss you, and your subtle, potent, but also tastefull humour.
+
+In loving memory of Tommy Squidsbrough,
+2015 - Forever
