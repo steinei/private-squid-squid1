@@ -57,7 +57,17 @@ public class Vector {
 		direction = Math.atan2(ySum, xSum);
 		direction %= (2 * Math.PI);
 		
-		magnitude = xSum / Math.cos(direction);
+		if (Math.cos(direction) > .2){
+			
+			magnitude = xSum / Math.cos(direction);
+			
+		}
+		else{
+			
+			magnitude = ySum / Math.sin(direction);
+			
+		}
+		
 		
 		return this;
 		
@@ -91,6 +101,12 @@ public class Vector {
 			return Math.abs(a);	
 		return a;
 		
+	}
+	
+	public String toString(){
+		
+		return "" + magnitude + "      " + direction/Math.PI + "*PI"; //should be direction then magnitude for consistency
+												  					  //but is currently flipped for testing
 	}
 
 }

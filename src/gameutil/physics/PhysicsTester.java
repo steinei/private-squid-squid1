@@ -25,8 +25,8 @@ public class PhysicsTester extends JFrame{
 	static int tileUnitWidth;
 	
 	static PhysicsTester PhysFrame;
-	static Player Player = new Player();
-	static Level currentLevel = Utils.loadLevel("mouseTest");
+	static Player player = new Player();
+	static Level currentLevel = Utils.loadLevel("Random Level");
 	static BufferedImage tileSheet = null;
 	
 	public PhysicsTester(){
@@ -47,6 +47,12 @@ public class PhysicsTester extends JFrame{
 			i.printStackTrace();
 	  }
 	  tileUnitWidth = tileSheet.getWidth() / TILE_WIDTH;
+	  
+	  try {
+		  	bfImage = ImageIO.read(new File("assets/plato.jpg"));
+	  } catch (IOException i) {
+		  	i.printStackTrace();
+	  }
 	  
 	  PhysFrame.setSize(800,600);
 	  PhysFrame.setLocationRelativeTo(null);
@@ -74,13 +80,17 @@ public class PhysicsTester extends JFrame{
 	  */
 	 public void paint(Graphics page) {
 		 
-		 
 		 BufferedImage tile = null;
 		 Image offscreen = createImage(getWidth(), getHeight());
 		 Graphics2D offPage = (Graphics2D) offscreen.getGraphics();
-		 
-		 
-		 
+		 offPage.fillRect(0, 300, 800, 300);
+		 if (player.getY() >= 300){
+			 player.setNormalForce(new Vector(Math.PI / 2, .005));
+			 player.hitGround();
+		 }
+		 player.updatePhysics();
+		 offPage.drawString("" + player.getNetForce(), 700, 50);
+		 offPage.drawImage(bfImage, (int) player.getX() - 50, (int) player.getY() - 50, 50, 50, this);
 		 page.drawImage(offscreen, 0, 0, this);
 		
 		 repaint();

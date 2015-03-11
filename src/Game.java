@@ -8,13 +8,13 @@ import javax.swing.*;
 	
 	/**
 	 * @author Ian Steiner and Tommy Rosebrough
-	 *
+	 * tommy made it not ugly
 	 */
 @SuppressWarnings("serial")
 public class Game extends JFrame{
 	
 	static Image bfImage = null;
-	static Point lastPoint, nextPoint, firstPoint, referencePoint;
+	static Point nextPoint;
 	static final Point Origin  = new Point(400,300);
 	static double angle = 0;
 	
@@ -30,9 +30,12 @@ public class Game extends JFrame{
 	static int tileUnitWidth;
 	
 	static Game GameFrame;
-	static Level currentLevel = Utils.loadLevel("Random Level");
+	static Level currentLevel = Utils.loadLevel("GameLoadTest");
 	static BufferedImage tileSheet = null;
 	
+	/*
+	 * Creates a JFrame window with title Gravity Prison
+	 */
 	public Game(){
 		super("Gravity Prison");
 	}
@@ -81,7 +84,7 @@ public class Game extends JFrame{
 	 /**
 		 * ActionListener for menuBar to open .lvl files.
 		 * Opens a dialog box to receive file name s
-		 * If s == null or s has a length of zero then the saving and loading is bypassed
+		 * If s == null or s has a length of zero then the loading is bypassed
 		 */
 		private static class GameListenerClass implements ActionListener {
 			
@@ -108,8 +111,6 @@ public class Game extends JFrame{
 	  private static class mouseClass implements MouseListener {
 		  public void mousePressed(MouseEvent e) {
 		   
-			  lastPoint = e.getPoint();
-			  firstPoint = e.getPoint();
 			  mouseIsPressed = true;
 			  System.out.println("Mouse is pressed");
 			  GameFrame.repaint();
@@ -130,15 +131,14 @@ public class Game extends JFrame{
 	
 	   @Override
 	   public void mouseReleased(MouseEvent e) {
-		   
-		   lastPoint = e.getPoint();
+
 		   mouseIsPressed = false;
 		   System.out.println("Mouse is unpressed");
 	   
 	   }
 	  }
 	 /**
-	  * @param Graphics g
+	  * @param Graphics page
 	  * Draws the level currently loaded and allows it to be rotated by clicking the mouse
 	  */
 	 public void paint(Graphics page) {
@@ -160,7 +160,12 @@ public class Game extends JFrame{
 			 
 			 //offPage.clearRect(0, 0, 800, 600);
 			 //offPage.drawString("" + nextPoint.x + "    " + nextPoint.y + "    " + angle + "    " + lastPoint.x + "    " + lastPoint.y, 50, 500);
-			 angle = ((nextPoint.x - Origin.x)*2.0/BAR_WIDTH)*2*Math.PI;
+			 if (Math.abs(nextPoint.x - Origin.x) > BAR_WIDTH/2){
+				 angle = 2*Math.PI;
+			 }
+			 else{
+				 angle = ((nextPoint.x - Origin.x)*2.0/BAR_WIDTH)*2*Math.PI;
+			 }
 			 //offPage.drawString("" + angle, 50, 560);
 			 //offPage.translate(Origin.x, Origin.y);
 			 offPage.rotate(angle, 400, 300);

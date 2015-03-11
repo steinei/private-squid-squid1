@@ -18,7 +18,7 @@ import javax.swing.*;
 public class Game extends JFrame{
 	
 	static Image bfImage = null;
-	static Point lastPoint, nextPoint, firstPoint, referencePoint;
+	static Point lastPoint, nextPoint, firstPoint;
 	static final Point Origin  = new Point(400,300);
 	static double angle = 0;
 	
@@ -27,14 +27,17 @@ public class Game extends JFrame{
 	
 	static boolean mouseIsPressed = false;
 	static boolean firstTime = true;
+	static boolean mouseError = false;
 	
-	static final int RECTANGLE_HEIGHT = 400, RECTANGLE_WIDTH = 300, BAR_WIDTH = 600;
+	static final double FPS = 60;
+	
+	static final int RECTANGLE_HEIGHT = 400, RECTANGLE_WIDTH = 300, BAR_WIDTH = 780;
 	static final int TILE_WIDTH = 25;
 	static final int TILE_HEIGHT = 25;
 	static int tileUnitWidth;
 	
 	static Game GameFrame;
-	static Level currentLevel = Utils.loadLevel("poop");
+	static Level currentLevel = Utils.loadLevel("Random Level");
 	static BufferedImage tileSheet = null;
 	
 	public Game(){
@@ -89,10 +92,11 @@ public class Game extends JFrame{
 	 public void paint(Graphics page) {
 		 
 		 
+		 long startTime = System.currentTimeMillis();
+	 	 
 		 BufferedImage tile = null;
 		 Image offscreen = createImage(getWidth(), getHeight());
 		 Graphics2D offPage = (Graphics2D) offscreen.getGraphics();
-			
 		 if (mouseIsPressed){
 			 
 			 firstTime = false;
@@ -100,12 +104,24 @@ public class Game extends JFrame{
 			 try {
 				 nextPoint = new Point(GameFrame.getMousePosition());
 			 } catch (NullPointerException i) {
-				 System.err.println("Mouse out of bounds case caught.");
+				 if (!mouseError){
+					 System.err.println("Mouse out of bounds case caught.");
+					 mouseError = true;
+				 }
+			 }
+			 if (GameFrame.getMousePosition() != null){
+				 mouseError = false;
 			 }
 			 
 			 //offPage.clearRect(0, 0, 800, 600);
 			 //offPage.drawString("" + nextPoint.x + "    " + nextPoint.y + "    " + angle + "    " + lastPoint.x + "    " + lastPoint.y, 50, 500);
 			 angle = ((nextPoint.x - Origin.x)*2.0/BAR_WIDTH)*2*Math.PI;
+			 if (angle > Math.PI*2){
+				 angle = Math.PI*2;
+			 }
+			 else if (angle < Math.PI*-2){
+				 angle = -Math.PI*2;
+			 }
 			 //offPage.drawString("" + angle, 50, 560);
 			 //offPage.translate(Origin.x, Origin.y);
 			 offPage.rotate(angle, 400, 300);
@@ -120,7 +136,6 @@ public class Game extends JFrame{
 						
 					}
 			 }
-			 GameFrame.repaint();
 		 }
 		 else{
 			 offPage.rotate(angle, 400, 300);
@@ -134,7 +149,6 @@ public class Game extends JFrame{
 						
 					}
 				}
-			 GameFrame.repaint();
 		 }
 		 if(firstTime){
 			 
@@ -149,8 +163,20 @@ public class Game extends JFrame{
 					}
 				}
 		 }
+		 page.drawImage(offscreen, 0, 0, this);
 		 
-		page.drawImage(offscreen, 0, 0, this);
+		 double wait = 1000 / FPS;
+		 long endTime   = System.currentTimeMillis();
+		 long totalTime = endTime - startTime;
+		 if (totalTime < wait) {
+			 try {
+				Thread.sleep((long) (wait - totalTime));
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		 }
+		 repaint();
 		
 	 }
 	  
