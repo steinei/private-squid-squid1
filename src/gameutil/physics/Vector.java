@@ -4,20 +4,35 @@ import java.lang.Math;
 
 public class Vector {
 	
-	private double direction;
-	private double magnitude;
+	private double x,
+			y,
+			direction,
+			magnitude;
 	
 	public Vector() {
 		
-		direction = 0;
-		magnitude = 0;
+		x = 0;
+		y = 0;
+		
 		
 	}
 
-	public Vector(double d, double m) {
+	public Vector(double xIn, double yIn) {
 		
-		direction = d;
-		magnitude = m;
+		x = xIn;
+		y = yIn;
+		
+	}
+	
+	public double getX() {
+		
+		return x;
+		
+	}
+	
+	public double getY() {
+		
+		return y;
 		
 	}
 	
@@ -33,6 +48,18 @@ public class Vector {
 		
 	}
 	
+	public void setX(double xIn) {
+		
+		x = xIn;
+		
+	}
+	
+	public void setY(double yIn) {
+		
+		y = yIn;
+		
+	}
+	
 	public void setDirection(double d) {
 		
 		direction = d;
@@ -45,7 +72,29 @@ public class Vector {
 		
 	}
 	
-	public Vector addVector( Vector v ){
+	public Vector addVector( Vector v ) {
+		
+		x += v.getX();
+		y += v.getY();
+		
+		update();
+		
+		return this;
+		
+	}
+	
+	public Vector addVector( double xIn, double yIn) {
+		
+		x += xIn;
+		y += yIn;
+		
+		update();
+		
+		return this;
+		
+	}
+	
+	/*public Vector addVector( Vector v ) {
 		double xComp = magnitude * Math.cos(direction);
 		double yComp = magnitude * Math.sin(direction);
 		double xAdd = v.getMagnitude() * Math.cos(v.getDirection());
@@ -73,7 +122,7 @@ public class Vector {
 		
 	}
 	
-	public Vector addVector( double d, double m ){
+	public Vector addVector( double d, double m ) {
 		double xComp = magnitude * Math.cos(direction);
 		double yComp = magnitude * Math.sin(direction);
 		double xAdd = m * Math.cos(d);
@@ -89,9 +138,9 @@ public class Vector {
 		
 		return this;
 		
-	}
+	}*/
 	
-	public double angleAbs(double a){
+	public double angleAbs(double a) {
 		
 		if (a > Math.PI)
 			return (2 * Math.PI) - a;
@@ -103,7 +152,17 @@ public class Vector {
 		
 	}
 	
-	public String toString(){
+	public void update() {
+		
+		direction = Math.atan2(y, x);
+		direction += Math.PI * 2;
+		direction %= (2 * Math.PI);
+			
+		magnitude = Math.sqrt(Math.pow(x,2) + Math.pow(y, 2));
+		
+	}
+	
+	public String toString() {
 		
 		return "" + magnitude + "      " + direction/Math.PI + "*PI"; //should be direction then magnitude for consistency
 												  					  //but is currently flipped for testing

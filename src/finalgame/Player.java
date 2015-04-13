@@ -4,12 +4,13 @@ import gameutil.physics.*;
 
 public class Player implements Gravity {
 	
-	private final Vector GRAVITY = new Vector(Math.PI * 3/2, .005);
+	private final Vector GRAVITY = new Vector(0, -.005);
 	private Vector velocity;
 	private Vector normalForce; //other forces to be added
 	private Vector netForce;
 	private double xPos;
 	private double yPos;
+	private boolean onGround = false;
 	
 	public Player() {
 		
@@ -47,13 +48,16 @@ public class Player implements Gravity {
 	}
 	public void setNormalForce(Vector v){
 		
-		normalForce = new Vector(v.getDirection(), v.getMagnitude());
+		normalForce = v;
 		
 	}
 	
 	public void hitGround(){
 		
-		velocity = new Vector();
+		if (!onGround){
+			onGround = true;
+			velocity = new Vector();
+		}
 		
 	}
 	
@@ -62,15 +66,15 @@ public class Player implements Gravity {
 	 */
 	public void updateNetForce(){
 		netForce = new Vector();
-		netForce.addVector(GRAVITY);
 		netForce.addVector(normalForce);
+		netForce.addVector(GRAVITY);
 	}
 	
 	public void updatePhysics(){
 		updateNetForce();
 		velocity.addVector(netForce);
-		xPos += velocity.getMagnitude() * Math.cos(velocity.getDirection());
-		yPos -= velocity.getMagnitude() * Math.sin(velocity.getDirection());
+		xPos += velocity.getX();
+		yPos -= velocity.getY();
 	}
 
 }

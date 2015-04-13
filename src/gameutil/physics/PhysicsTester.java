@@ -80,16 +80,18 @@ public class PhysicsTester extends JFrame{
 	  */
 	 public void paint(Graphics page) {
 		 
+		 double slope;
 		 BufferedImage tile = null;
 		 Image offscreen = createImage(getWidth(), getHeight());
 		 Graphics2D offPage = (Graphics2D) offscreen.getGraphics();
-		 offPage.fillRect(0, 300, 800, 300);
-		 if (player.getY() >= 300){
-			 player.setNormalForce(new Vector(Math.PI / 2, .005));
+		 offPage.drawLine(0, 300, 800, 600);
+		 if (player.getY() - 300 * player.getX() / 800 >= 298){
 			 player.hitGround();
+			 player.setNormalForce(new Vector(.0017556, .00434)); // angle isn't working right now
 		 }
 		 player.updatePhysics();
-		 offPage.drawString("" + player.getNetForce(), 700, 50);
+		 offPage.drawString("" + player.getNetForce().getDirection(), 700, 50);
+		 offPage.drawString("" + player.getNetForce().getMagnitude(), 700, 75);
 		 offPage.drawImage(bfImage, (int) player.getX() - 50, (int) player.getY() - 50, 50, 50, this);
 		 page.drawImage(offscreen, 0, 0, this);
 		
@@ -121,7 +123,6 @@ public class PhysicsTester extends JFrame{
 				 i.printStackTrace();
 			 }
 			 PhysFrame.repaint();
-			 
 		 }
 	 }
 

@@ -31,7 +31,7 @@ public class Game extends JFrame{
 	
 	static final double FPS = 60;
 	
-	static final int RECTANGLE_HEIGHT = 400, RECTANGLE_WIDTH = 300, BAR_WIDTH = 780;
+	static final int RECTANGLE_HEIGHT = 400, RECTANGLE_WIDTH = 300, BAR_WIDTH = 700;
 	static final int TILE_WIDTH = 25;
 	static final int TILE_HEIGHT = 25;
 	static int tileUnitWidth;
@@ -91,7 +91,6 @@ public class Game extends JFrame{
 	  */
 	 public void paint(Graphics page) {
 		 
-		 
 		 long startTime = System.currentTimeMillis();
 	 	 
 		 BufferedImage tile = null;
@@ -124,6 +123,7 @@ public class Game extends JFrame{
 			 }
 			 //offPage.drawString("" + angle, 50, 560);
 			 //offPage.translate(Origin.x, Origin.y);
+			 offPage.drawString("" + angle, 600, 50);
 			 offPage.rotate(angle, 400, 300);
 			 
 			 for (int y = 0; y < 10; y++){
