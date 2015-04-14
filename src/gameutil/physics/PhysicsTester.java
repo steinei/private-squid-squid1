@@ -80,14 +80,17 @@ public class PhysicsTester extends JFrame{
 	  */
 	 public void paint(Graphics page) {
 		 
-		 double slope;
+		 double rise = 6,
+				 run = 8,
+				 slope = rise / run,
+				 sideCalc = Math.sqrt(Math.pow(.005, 2)/((Math.pow(rise, 2) + Math.pow(run, 2))));
 		 BufferedImage tile = null;
 		 Image offscreen = createImage(getWidth(), getHeight());
 		 Graphics2D offPage = (Graphics2D) offscreen.getGraphics();
-		 offPage.drawLine(0, 300, 800, 600);
-		 if (player.getY() - 300 * player.getX() / 800 >= 298){
+		 offPage.drawLine(0, 300, 800, (int) (300 - slope*800));
+		 if (player.getY() + slope * player.getX() >= 300){
 			 player.hitGround();
-			 player.setNormalForce(new Vector(.0017556, .00434)); // angle isn't working right now
+			 player.setNormalForce(new Vector(-rise*sideCalc, (slope*(-rise*sideCalc) + .005))); // angle isn't working right now
 		 }
 		 player.updatePhysics();
 		 offPage.drawString("" + player.getNetForce().getDirection(), 700, 50);
