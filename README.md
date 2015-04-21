@@ -13,7 +13,7 @@ controls already use the x position of the mouse, which is only a step away from
 
 The physics is managed by a vector class which has doubles direction and magnitude. The player class has a vector for velocity,
 a final vector for gravity, and it constantly is adding gravity to its velocity vector, unless its touching a wall, in which
-case it also adds normal vector, creating an illusion of sliding along a surface. Not all of these have been implemented yet,
+case it also adds normal vector, creating an illusion of sliding along a surface. Not all of these have been fully implemented yet,
 but the structure for it is in place.
 
 Our classes are in four packages: finalgame (which holds Game, Level, and Player), gameutil (Util), gameutil.level (MapEditor),
